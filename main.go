@@ -7,6 +7,8 @@ import (
 	"encoding/binary"
 
 	"github.com/nsf/termbox-go"
+	"github.com/O-tero/terminal-screen/input"
+	
 )
 
 const (
@@ -29,12 +31,21 @@ type Screen struct {
 }
 
 func main() {
-	// Step 1: Read binary stream
-	data, err := os.ReadFile("input.bin")
+	// Generate the binary file
+	err := input.GenerateBinaryFile("input.bin")
 	if err != nil {
-		fmt.Println("Error reading input:", err)
+		fmt.Println("Error generating binary file:", err)
 		return
 	}
+
+	// Ensure the input file exists
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: main <input file>")
+		return
+	}
+
+	inputFile := os.Args[1]
+	fmt.Printf("Processing binary file: %s\n", inputFile)
 
 	// Step 2: Initialize termbox
 	if err := termbox.Init(); err != nil {
@@ -44,6 +55,11 @@ func main() {
 	defer termbox.Close()
 
 	screen := Screen{}
+	data, err := os.ReadFile(inputFile)
+	if err != nil {
+		fmt.Println("Error reading input file:", err)
+		return
+	}
 	reader := bytes.NewReader(data)
 	var setupDone bool
 
